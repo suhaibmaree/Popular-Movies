@@ -46,9 +46,9 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView =findViewById(R.id.recycler_view);
         movieList = new ArrayList<>();
-        movieAdapter =new Adapter(this, movieList);
+        movieAdapter =new Adapter(MainActivity.this, movieList);
         recyclerView.setLayoutManager(new GridLayoutManager(this,2));
-        recyclerView.setAdapter(Adapter);
+        recyclerView.setAdapter(movieAdapter);
         loadJson();
 
     }//end initViews
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<MoviesResponse> call, Response<MoviesResponse> response) {
                     List<Movie> movies =response.body().getResults();
-                    recyclerView.setAdapter(new Adapter(this,movies));
+                    recyclerView.setAdapter(new Adapter(MainActivity.this, movies));
                     recyclerView.smoothScrollToPosition(0);
                 }
 

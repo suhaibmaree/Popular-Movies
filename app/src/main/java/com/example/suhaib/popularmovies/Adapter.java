@@ -36,7 +36,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
 
     @Override
     public void onBindViewHolder(Adapter.MyViewHolder holder, int position) {
-        holder.titel.setText(movieList.get(position).getOriginalTitle());
+        holder.title.setText(movieList.get(position).getOriginalTitle());
         String vote = Double.toString(movieList.get(position).getVoteAverage());
         holder.userrating.setText(vote);
 
@@ -48,19 +48,24 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
 
     @Override
     public int getItemCount() {
-        return movieList.size();
+        if(movieList != null) {
+            return movieList.size();
+        }
+        else
+            Toast.makeText(mContext,"List is null",Toast.LENGTH_LONG).show();
+            return  0;
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
 
-        public TextView titel;
+        public TextView title;
         public TextView userrating;
         public ImageView cardImage;
 
 
         public MyViewHolder(View itemView) {
             super(itemView);
-            titel = itemView.findViewById(R.id.movietitle);
+            title = itemView.findViewById(R.id.movietitle);
             userrating = itemView.findViewById(R.id.userrating);
             cardImage = itemView.findViewById(R.id.card_image);
 
@@ -79,7 +84,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         mContext.startActivity(intent);
                         Toast.makeText(view.getContext(),movie.getOriginalTitle(),
-                                Toast.LENGTH_SHORT).show();
+                                Toast.LENGTH_LONG).show();
 
                     }
                 }

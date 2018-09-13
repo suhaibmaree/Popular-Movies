@@ -40,8 +40,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
 
     @Override
     public void onBindViewHolder(Adapter.MyViewHolder holder, int position) {
-        holder.title.setText(movieList.get(position).getOriginalTitle());
-        String vote = Double.toString(movieList.get(position).getVoteAverage());
+        holder.title.setText(movieList.get(holder.getAdapterPosition()).getOriginalTitle());
+        String vote = Double.toString(movieList.get(holder.getAdapterPosition()).getVoteAverage());
         holder.userrating.setText(vote);
 
         Glide.with(mContext)

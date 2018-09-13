@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.suhaib.popularmovies.Movie;
 
@@ -79,5 +80,15 @@ public class NetworkUtils {
         }
     }//end parsJson
 
+    public static Boolean networkStatus(Context context){
+        ConnectivityManager manager = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()){
+            return true;
+        }
+        Toast.makeText(context,"No Internet Connection",Toast.LENGTH_LONG).show();
+        return false;
+    }
 
 }

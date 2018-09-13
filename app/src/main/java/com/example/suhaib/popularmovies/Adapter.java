@@ -83,7 +83,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
                         intent.putExtra("poster_path",movieList.get(pos).getPoster_path());
                         intent.putExtra("overview",movieList.get(pos).getOverview());
                         intent.putExtra("vote_average",Double.toString(movieList.get(pos).getVoteAverage()));
-                        intent.putExtra("release",movieList.get(pos).getReleaseData());
+                        intent.putExtra("release_date",movieList.get(pos).getReleaseData());
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         mContext.startActivity(intent);
                         Toast.makeText(view.getContext(),movie.getOriginalTitle(),

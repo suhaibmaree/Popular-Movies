@@ -22,7 +22,10 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar mProgressBar;
     private String popularMovies;
     private String topRatedMovies;
-    private String myKey = "b4999fff82a03f767ca4f5fb9ab9521f";
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //Please note that you should set your [API KEY] in myKey from https://www.themoviedb.org/
+    private String myKey = "SET YOUR KEY HERE";
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     ArrayList<Movie> mPopularList;
     ArrayList<Movie> mTopTopRatedList;
 
@@ -34,8 +37,6 @@ public class MainActivity extends AppCompatActivity {
         mProgressBar = findViewById(R.id.indeterminateBar);
         mProgressBar.setVisibility(View.INVISIBLE);
         new FetchMovies().execute();
-        //String test = mPopularList.get(0).getTitle();
-        //Toast.makeText(this,test,Toast.LENGTH_LONG).show();
         initViews();
     }//end onCreate
 
@@ -63,9 +64,10 @@ public class MainActivity extends AppCompatActivity {
             try {
                     mPopularList = NetworkUtils.fetchData(popularMovies); //Get popular movies
                     mTopTopRatedList = NetworkUtils.fetchData(topRatedMovies); //Get top rated movies
-            } catch (IOException e){
+            }//end try
+            catch (IOException e){
                 e.printStackTrace();
-            }
+            }//end catch
             return null;
         }
 

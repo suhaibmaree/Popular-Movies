@@ -93,12 +93,20 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.menu_settings:
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        int id = item.getItemId();
+        if (id == R.id.pop_movies) {
+            refreshList(mPopularList);
         }
+        if (id == R.id.top_movies) {
+            refreshList(mTopTopRatedList);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void refreshList(ArrayList<Movie> list) {
+        Adapter adapter = new Adapter(MainActivity.this, list);
+        recyclerView.setLayoutManager(new GridLayoutManager(this,2));
+        recyclerView.setAdapter(adapter);
     }
 
 

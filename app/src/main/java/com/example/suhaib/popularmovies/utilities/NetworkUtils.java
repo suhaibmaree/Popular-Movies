@@ -69,10 +69,10 @@ public class NetworkUtils {
                 movie.setOriginalTitle(jsonObject.getString("original_title"));
                 movie.setTitle(jsonObject.getString("title"));
                 movie.setPopularity(jsonObject.getDouble("popularity"));
-                movie.setBackdropPath(jsonObject.getString("backdrop_path"));
+                movie.setBackdropPath("https://image.tmdb.org/t/p/w185"+jsonObject.getString("backdrop_path"));
                 movie.setOverview(jsonObject.getString("overview"));
                 movie.setReleaseData(jsonObject.getString("release_date"));
-                movie.setPoster_path(jsonObject.getString("poster_path"));
+                movie.setPoster_path("https://image.tmdb.org/t/p/w185"+jsonObject.getString("poster_path"));
                 //Adding a new movie object into ArrayList
                 list.add(movie);
             }

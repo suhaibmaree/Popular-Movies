@@ -1,6 +1,9 @@
 package com.example.suhaib.popularmovies;
 
+import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -22,21 +25,25 @@ public class DetailActivity extends AppCompatActivity {
     TextView userRating;
     TextView releaseData;
     ImageView imageView;
-
+    CollapsingToolbarLayout collapsingToolbarLayout = null;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        initCollapsingToolbar();
+        android.support.v7.app.ActionBar actionBar =getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        collapsingToolbarLayout = findViewById(R.id.collapsingtoolbar);
+        collapsingToolbarLayout.setTitle("Movie Details");
+        //++++++++++++++++++++++++++++++++++++++++++++
         imageView = findViewById(R.id.image_header);
         nameOfMovie =findViewById(R.id.movietitle);
         plotSynopsis = findViewById(R.id.plotsynopsis);
         userRating = findViewById(R.id.userrating);
         releaseData = findViewById(R.id.releasedate);
-
+        //+++++++++++++++++++++++++++++++++++++++++++
         Intent intent = getIntent();
         if(intent.hasExtra("original_title")){
             String posterPath = getIntent().getExtras().getString("poster_path");
@@ -58,35 +65,8 @@ public class DetailActivity extends AppCompatActivity {
             Toast.makeText(this,"No API Data",Toast.LENGTH_SHORT).show();
         }
 
-    }
+    }// end onCreat
 
-    private  void initCollapsingToolbar(){
-        final CollapsingToolbarLayout collapsingToolbarLayout =
-                findViewById(R.id.collapsingtoolbar);
-        collapsingToolbarLayout.setTitle("");
-        AppBarLayout appBarLayout =findViewById(R.id.appbar);
-        appBarLayout.setExpanded(true);
 
-        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            boolean isShow =false;
-            int scrallRange = -1;
 
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-
-                    if(scrallRange == -1){
-                        scrallRange = appBarLayout.getTotalScrollRange();
-                    }
-                    if (scrallRange + verticalOffset ==0) {
-                        collapsingToolbarLayout.setTitle(getString(R.string.movie_details));
-                        isShow = true;
-                    }
-                    else if (isShow){
-                        collapsingToolbarLayout.setTitle(" ");
-                        isShow = false;
-                    }
-
-            }
-        });
-    }
 }

@@ -22,7 +22,6 @@
 
         <activity
             android:name=".DetailActivity"
-            android:label="Movies"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
             android:parentActivityName=".MainActivity">
             <meta-data

@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Void  s) {
             super.onPostExecute(s);
             mProgressBar.setVisibility(View.INVISIBLE);
+            movieAdapter.setMovieList(mPopularList);
         }
 
     }//end AsyncTask

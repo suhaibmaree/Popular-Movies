@@ -16,6 +16,10 @@ public class Movie implements Serializable {
     private String title;
     private double popularity;
     private String backdropPath;
+    private String overview;
+    private String releaseData;
+    private String poster_path;
+    private Boolean video;
 
     public int getId() {
         return id;
@@ -105,16 +109,6 @@ public class Movie implements Serializable {
         this.video = video;
     }
 
-    private String overview;
-    private String releaseData;
-    private String poster_path;
-
-
-
-
-
-
-    private Boolean video;
 
 
 

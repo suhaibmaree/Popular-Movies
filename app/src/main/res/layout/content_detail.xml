@@ -7,9 +7,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.suhaib.popularmovies.DetailActivity"
     tools:showIn="@layout/detail">
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -108,5 +106,4 @@
 
 
         </LinearLayout>
-    </ScrollView>
 </RelativeLayout>

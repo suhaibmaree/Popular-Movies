@@ -26,6 +26,10 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
         this.mContext = mContext;
         this.movieList = movieList;
     }
+    public void setMovieList(List<Movie> movieList){
+        this.movieList = movieList;
+        notifyDataSetChanged();
+    }
 
     @Override
     public Adapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -51,10 +55,9 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
         if(movieList != null) {
             return movieList.size();
         }
-        else
-            Toast.makeText(mContext,"List is null",Toast.LENGTH_LONG).show();
             return  0;
     }
+
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
 
@@ -91,5 +94,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
             });
         }
     }
+
+
 
 }

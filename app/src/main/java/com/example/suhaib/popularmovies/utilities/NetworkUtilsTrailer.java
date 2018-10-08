@@ -3,10 +3,8 @@ package com.example.suhaib.popularmovies.utilities;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
 import android.widget.Toast;
-
-import com.example.suhaib.popularmovies.Movie;
+import com.example.suhaib.popularmovies.Trailer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,15 +16,13 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * Created by suhaib on 9/11/18.
+ * Created by suhaib on 10/8/18.
  */
 
-public class NetworkUtils {
+public class NetworkUtilsTrailer {
 
-    private static final String TAG = NetworkUtils.class.getSimpleName();
-
-    public static ArrayList<Movie> fetchData(String url) throws IOException {
-        ArrayList<Movie> movies = new ArrayList<Movie>();
+    public static ArrayList<Trailer> fetchData(String url) throws IOException {
+        ArrayList<Trailer> Trailers = new ArrayList<Trailer>();
         URL new_url = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) new_url.openConnection();
         try {
@@ -37,17 +33,17 @@ public class NetworkUtils {
             boolean hasInput = scanner.hasNext();
             if (hasInput) {
                 String results = scanner.next();
-                parseJson(results, movies);
+                parseJson(results, Trailers);
             } else {
                 return null;
             }
         } finally {
             connection.disconnect();
         }
-        return movies;
-    }
+        return Trailers;
+    }//end Fetch Data
 
-    public static void parseJson(String data, ArrayList<Movie> list) {
+    public static void parseJson(String data, ArrayList<Trailer> list) {
 
         try {
 
@@ -56,24 +52,15 @@ public class NetworkUtils {
 
             for (int i = 0; i < resArray.length(); i++) {
                 JSONObject jsonObject = resArray.getJSONObject(i);
-                Movie movie = new Movie(); //New Movie object
-                movie.setId(jsonObject.getInt("id"));
-                movie.setVoteAverage(jsonObject.getDouble("vote_average"));
-                movie.setVoteCount(jsonObject.getInt("vote_count"));
-                movie.setOriginalTitle(jsonObject.getString("original_title"));
-                movie.setTitle(jsonObject.getString("title"));
-                movie.setPopularity(jsonObject.getDouble("popularity"));
-                movie.setBackdropPath("https://image.tmdb.org/t/p/w185" + jsonObject.getString("backdrop_path"));
-                movie.setOverview(jsonObject.getString("overview"));
-                movie.setReleaseData(jsonObject.getString("release_date"));
-                movie.setPoster_path("https://image.tmdb.org/t/p/w185" + jsonObject.getString("poster_path"));
-                //Adding a new movie object into ArrayList
-                list.add(movie);
+                Trailer trailer = new Trailer(); //New Trailer object
+                trailer.setKey(jsonObject.getString("key"));
+                trailer.setName(jsonObject.getString("name"));
+                //Adding a new Trailer object into ArrayList
+                list.add(trailer);
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e(TAG, "Error occurred during JSON Parsing", e);
         }
     }//end parsJson
 

@@ -4,16 +4,27 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
+import com.example.suhaib.popularmovies.utilities.NetworkUtils;
+import com.example.suhaib.popularmovies.utilities.NetworkUtilsTrailer;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by suhaib on 9/8/18.
@@ -25,12 +36,24 @@ public class DetailActivity extends AppCompatActivity {
     TextView userRating;
     TextView releaseData;
     ImageView imageView;
+    ProgressBar mProgressBar;
     CollapsingToolbarLayout collapsingToolbarLayout = null;
+    private RecyclerView recyclerView;
+    private TrailerAdapter trailerAdapter;
+    ArrayList<Trailer> mTrailerList;
+    private String trailerUrl;
+
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //Please note that you should set your [API KEY] in myKey from https://www.themoviedb.org/
+    private String myKey = "b4999fff82a03f767ca4f5fb9ab9521f";
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail);
-
+        mProgressBar = findViewById(R.id.progressBar);
+        mProgressBar.setVisibility(View.INVISIBLE);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         android.support.v7.app.ActionBar actionBar =getSupportActionBar();
@@ -39,7 +62,7 @@ public class DetailActivity extends AppCompatActivity {
         collapsingToolbarLayout.setTitle("Movie Details");
         //++++++++++++++++++++++++++++++++++++++++++++
         imageView = findViewById(R.id.image_header);
-        nameOfMovie =findViewById(R.id.movietitle);
+        nameOfMovie =findViewById(R.id.title);
         plotSynopsis = findViewById(R.id.plotsynopsis);
         userRating = findViewById(R.id.userrating);
         releaseData = findViewById(R.id.releasedate);
@@ -65,8 +88,52 @@ public class DetailActivity extends AppCompatActivity {
             Toast.makeText(this,"No API Data",Toast.LENGTH_SHORT).show();
         }
 
+        NetworkUtilsTrailer.networkStatus(DetailActivity.this);
+        new FetchTrailer().execute();
+        initViews();
+
     }// end onCreat
 
+    private void initViews(){
+
+        recyclerView =findViewById(R.id.recycler_view1);
+        trailerAdapter =new TrailerAdapter(DetailActivity.this, mTrailerList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        recyclerView.setAdapter(trailerAdapter);
+
+    }//end initViews
+
+    //AsyncTask
+    public class FetchTrailer extends AsyncTask<Void,Void,Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            String movieId = getIntent().getExtras().getString("id");
+            trailerUrl = "http://api.themoviedb.org/3/movie/"+movieId+"/videos?api_key=" +myKey;
+
+            mTrailerList = new ArrayList<>();
+            try {
+                mTrailerList = NetworkUtilsTrailer.fetchData(trailerUrl); //Get Trailer movies
+            }//end try
+            catch (IOException e){
+                e.printStackTrace();
+            }//end catch
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected void onPostExecute(Void  s) {
+            super.onPostExecute(s);
+            trailerAdapter.setTrailerList(mTrailerList);
+            mProgressBar.setVisibility(View.INVISIBLE);
+        }
+
+    }//end AsyncTask
 
 
 }

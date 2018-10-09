@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
+import com.example.suhaib.popularmovies.database.AppDatabase;
 import com.example.suhaib.popularmovies.utilities.NetworkUtils;
 import com.example.suhaib.popularmovies.utilities.NetworkUtilsTrailer;
 
@@ -42,12 +44,12 @@ public class DetailActivity extends AppCompatActivity {
     private TrailerAdapter trailerAdapter;
     ArrayList<Trailer> mTrailerList;
     private String trailerUrl;
-
+    private Movie mMovie;
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //Please note that you should set your [API KEY] in myKey from https://www.themoviedb.org/
     private String myKey = "b4999fff82a03f767ca4f5fb9ab9521f";
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
+    private boolean added = false;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +77,8 @@ public class DetailActivity extends AppCompatActivity {
             String rating = getIntent().getExtras().getString("vote_average");
             String dateOfRelease = getIntent().getExtras().getString("release_date");
 
+            mMovie = (Movie) intent.getSerializableExtra("movie");
+
             Glide.with(this)
                     .load(posterPath)
                     .placeholder(R.drawable.load)
@@ -91,6 +95,15 @@ public class DetailActivity extends AppCompatActivity {
         NetworkUtilsTrailer.networkStatus(DetailActivity.this);
         new FetchTrailer().execute();
         initViews();
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                added = AppDatabase.getInstance(DetailActivity.this)
+                        .getMoviesDao()
+                        .checkMovie(mMovie.getId()).size() > 0;
+            }
+        });
+
 
     }// end onCreat
 
@@ -101,13 +114,39 @@ public class DetailActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recyclerView.setAdapter(trailerAdapter);
 
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (added){
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            AppDatabase.getInstance(DetailActivity.this)
+                                    .getMoviesDao()
+                                    .delete(mMovie);
+                        }
+                    });
+                }else
+                AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        AppDatabase.getInstance(DetailActivity.this)
+                                .getMoviesDao()
+                                .addMovie(mMovie);
+                    }
+                });
+
+            }
+        });
+
     }//end initViews
 
     //AsyncTask
     public class FetchTrailer extends AsyncTask<Void,Void,Void> {
         @Override
         protected Void doInBackground(Void... voids) {
-            String movieId = getIntent().getExtras().getString("id");
+            int movieId = getIntent().getExtras().getInt("id");
             trailerUrl = "http://api.themoviedb.org/3/movie/"+movieId+"/videos?api_key=" +myKey;
 
             mTrailerList = new ArrayList<>();

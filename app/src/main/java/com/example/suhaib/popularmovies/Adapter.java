@@ -79,6 +79,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
                     if(pos != RecyclerView.NO_POSITION){
                         Movie movie =movieList.get(pos);
                         Intent intent = new Intent(mContext, DetailActivity.class);
+                        intent.putExtra("movie",movieList.get(pos));
                         intent.putExtra("original_title",movieList.get(pos).getOriginalTitle());
                         intent.putExtra("poster_path",movieList.get(pos).getPoster_path());
                         intent.putExtra("overview",movieList.get(pos).getOverview());

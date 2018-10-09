@@ -1,8 +1,9 @@
 package com.example.suhaib.popularmovies;
 
 
-
+import android.arch.lifecycle.Observer;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,10 +12,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+
+import com.example.suhaib.popularmovies.database.AppDatabase;
 import com.example.suhaib.popularmovies.utilities.NetworkUtils;
 import com.example.suhaib.popularmovies.utilities.Utility;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     int mNoOfColumns;
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //Please note that you should set your [API KEY] in myKey from https://www.themoviedb.org/
-      private String myKey = "b4999fff82a03f767ca4f5fb9ab9521f";
+    private String myKey = "b4999fff82a03f767ca4f5fb9ab9521f";
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     ArrayList<Movie> mPopularList;
     ArrayList<Movie> mTopTopRatedList;
@@ -44,32 +49,32 @@ public class MainActivity extends AppCompatActivity {
         initViews();
     }//end onCreate
 
-    private void initViews(){
+    private void initViews() {
 
 
-        recyclerView =findViewById(R.id.recycler_view);
-        movieAdapter =new Adapter(MainActivity.this, mPopularList);
-        recyclerView.setLayoutManager(new GridLayoutManager(this,mNoOfColumns));
+        recyclerView = findViewById(R.id.recycler_view);
+        movieAdapter = new Adapter(MainActivity.this, mPopularList);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, mNoOfColumns));
         recyclerView.setAdapter(movieAdapter);
 
     }//end initViews
 
     //AsyncTask
-    public class FetchMovies extends AsyncTask<Void,Void,Void> {
+    public class FetchMovies extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
             popularMovies = "http://api.themoviedb.org/3/movie/popular?api_key="
-            +myKey;
+                    + myKey;
 
             topRatedMovies = "http://api.themoviedb.org/3/movie/top_rated?api_key="
-            +myKey;
+                    + myKey;
             mPopularList = new ArrayList<>();
             mTopTopRatedList = new ArrayList<>();
             try {
-                    mPopularList = NetworkUtils.fetchData(popularMovies); //Get popular movies
-                    mTopTopRatedList = NetworkUtils.fetchData(topRatedMovies); //Get top rated movies
+                mPopularList = NetworkUtils.fetchData(popularMovies); //Get popular movies
+                mTopTopRatedList = NetworkUtils.fetchData(topRatedMovies); //Get top rated movies
             }//end try
-            catch (IOException e){
+            catch (IOException e) {
                 e.printStackTrace();
             }//end catch
             return null;
@@ -82,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(Void  s) {
+        protected void onPostExecute(Void s) {
             super.onPostExecute(s);
             mProgressBar.setVisibility(View.INVISIBLE);
             movieAdapter.setMovieList(mPopularList);
@@ -102,17 +107,28 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.pop_movies) {
             refreshList(mPopularList);
-        }
-        if (id == R.id.top_movies) {
+            
+        } else if (id == R.id.top_movies) {
             refreshList(mTopTopRatedList);
+        } else if (id == R.id.favorites) {
+            showFromDatabase();
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void refreshList(ArrayList<Movie> list) {
-        Adapter adapter = new Adapter(MainActivity.this, list);
-        recyclerView.setLayoutManager(new GridLayoutManager(this,2));
-        recyclerView.setAdapter(adapter);
+    private void showFromDatabase() {
+        AppDatabase.getInstance(this).getMoviesDao()
+                .getAllMovies()
+                .observe(this, new Observer<List<Movie>>() {
+                    @Override
+                    public void onChanged(@Nullable List<Movie> movies) {
+                        refreshList(movies);
+                    }
+                });
+    }
+
+    private void refreshList(List<Movie> list) {
+        movieAdapter.setMovieList(list);
     }
 
 }

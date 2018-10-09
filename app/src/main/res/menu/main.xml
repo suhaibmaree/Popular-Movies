@@ -12,5 +12,10 @@
         android:title="@string/top_mov"
         android:orderInCategory="1"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/favorites"
+        android:title="@string/favorites"
+        android:orderInCategory="1"
+        app:showAsAction="never" />
 
 </menu>

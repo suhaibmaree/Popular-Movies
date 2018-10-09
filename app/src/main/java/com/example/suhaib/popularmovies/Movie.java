@@ -1,14 +1,19 @@
 package com.example.suhaib.popularmovies;
 
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+
 import java.io.Serializable;
 
 /**
  * Created by suhaib on 9/8/18.
  */
 
+@Entity
 public class Movie implements Serializable {
 
+    @PrimaryKey
     private int id ;
     private Double voteAverage;
     private int voteCount;

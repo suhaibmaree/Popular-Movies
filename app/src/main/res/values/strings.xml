@@ -13,15 +13,7 @@
     <string name="pop_mov">Show popular movies</string>
     <string name="top_mov">Show top rated movies</string>
     <string name="trailer">Trailer</string>
-
-
-
-
-
-
-
-
-
+    <string name="favorites">Favorites</string>
 
 
 </resources>

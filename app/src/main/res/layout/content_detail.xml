@@ -91,7 +91,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 tools:layout_editor_absoluteX="168dp"
-                tools:layout_editor_absoluteY="0dp" />
+                tools:layout_editor_absoluteY="0dp"
+                tools:ignore="MissingConstraints" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view1"

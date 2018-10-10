@@ -23,6 +23,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String ARG_FLAG = "flag";
     private RecyclerView recyclerView;
     private Adapter movieAdapter;
     ProgressBar mProgressBar;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     ArrayList<Movie> mPopularList;
     ArrayList<Movie> mTopTopRatedList;
+    private int flag;
 
 
     @Override
@@ -45,8 +47,19 @@ public class MainActivity extends AppCompatActivity {
         mProgressBar.setVisibility(View.INVISIBLE);
         mNoOfColumns = Utility.calculateNoOfColumns(getApplicationContext());
         NetworkUtils.networkStatus(MainActivity.this);
-        new FetchMovies().execute();
+
+        if (savedInstanceState != null){
+            flag = savedInstanceState.getInt(ARG_FLAG);
+        }else
+            flag = 0;
+
+        if (flag == 2)
+            showFromDatabase();
+        else
+            new FetchMovies(flag).execute();
+
         initViews();
+        updateTitle();
     }//end onCreate
 
     private void initViews() {
@@ -61,6 +74,10 @@ public class MainActivity extends AppCompatActivity {
 
     //AsyncTask
     public class FetchMovies extends AsyncTask<Void, Void, Void> {
+        int flag;
+        FetchMovies(int flag){
+            this.flag = flag;
+        }
         @Override
         protected Void doInBackground(Void... voids) {
             popularMovies = "http://api.themoviedb.org/3/movie/popular?api_key="
@@ -90,7 +107,10 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Void s) {
             super.onPostExecute(s);
             mProgressBar.setVisibility(View.INVISIBLE);
-            movieAdapter.setMovieList(mPopularList);
+            if (flag == 0)
+                movieAdapter.setMovieList(mPopularList);
+            else if (flag == 1)
+                movieAdapter.setMovieList(mTopTopRatedList);
         }
 
     }//end AsyncTask
@@ -107,21 +127,35 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.pop_movies) {
             refreshList(mPopularList);
-            
+            flag =0;
+
         } else if (id == R.id.top_movies) {
             refreshList(mTopTopRatedList);
+            flag = 1;
         } else if (id == R.id.favorites) {
             showFromDatabase();
+            flag = 2;
         }
+
+        updateTitle();
         return super.onOptionsItemSelected(item);
     }
 
+    void updateTitle(){
+        if (flag == 0)
+            setTitle("Most Populer");
+        else if (flag == 1)
+            setTitle("Top Rated");
+        else if (flag == 2)
+            setTitle("Favorites");
+    }
     private void showFromDatabase() {
         AppDatabase.getInstance(this).getMoviesDao()
                 .getAllMovies()
                 .observe(this, new Observer<List<Movie>>() {
                     @Override
                     public void onChanged(@Nullable List<Movie> movies) {
+                        if (flag == 2)
                         refreshList(movies);
                     }
                 });
@@ -131,5 +165,10 @@ public class MainActivity extends AppCompatActivity {
         movieAdapter.setMovieList(list);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(ARG_FLAG,flag);
+    }
 }
 

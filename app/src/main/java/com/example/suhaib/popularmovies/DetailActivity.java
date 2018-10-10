@@ -125,6 +125,14 @@ public class DetailActivity extends AppCompatActivity {
                             AppDatabase.getInstance(DetailActivity.this)
                                     .getMoviesDao()
                                     .delete(mMovie);
+                            added = false;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(DetailActivity.this,mMovie.getTitle()+" Deleted from Favorites",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         }
                     });
                 }else
@@ -134,6 +142,14 @@ public class DetailActivity extends AppCompatActivity {
                         AppDatabase.getInstance(DetailActivity.this)
                                 .getMoviesDao()
                                 .addMovie(mMovie);
+                        added = true;
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(DetailActivity.this,mMovie.getTitle()+" Added to Favorites",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
                 });
 

@@ -14,6 +14,9 @@
     <string name="top_mov">Show top rated movies</string>
     <string name="trailer">Trailer</string>
     <string name="favorites">Favorites</string>
+    <string name="auther">Auther:</string>
+    <string name="review">Review:</string>
+    <string name="reviews">Reviews</string>
 
 
 </resources>

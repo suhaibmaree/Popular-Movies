@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     int mNoOfColumns;
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //Please note that you should set your [API KEY] in myKey from https://www.themoviedb.org/
-    private String myKey = "b4999fff82a03f767ca4f5fb9ab9521f";
+    private String myKey = "Your key";
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     ArrayList<Movie> mPopularList;
     ArrayList<Movie> mTopTopRatedList;

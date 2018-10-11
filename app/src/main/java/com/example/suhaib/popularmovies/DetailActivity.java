@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.suhaib.popularmovies.database.AppDatabase;
 import com.example.suhaib.popularmovies.utilities.NetworkUtils;
+import com.example.suhaib.popularmovies.utilities.NetworkUtilsReview;
 import com.example.suhaib.popularmovies.utilities.NetworkUtilsTrailer;
 
 import java.io.IOException;
@@ -40,16 +41,25 @@ public class DetailActivity extends AppCompatActivity {
     ImageView imageView;
     ProgressBar mProgressBar;
     CollapsingToolbarLayout collapsingToolbarLayout = null;
+    private boolean added = false;
+
     private RecyclerView recyclerView;
     private TrailerAdapter trailerAdapter;
     ArrayList<Trailer> mTrailerList;
     private String trailerUrl;
     private Movie mMovie;
+
+    private RecyclerView recyclerView1;
+    private ReviewAdapter reviewAdapter;
+    ArrayList<Review> mReviewList;
+    private String reviewUrl;
+    private Review mReview;
+
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //Please note that you should set your [API KEY] in myKey from https://www.themoviedb.org/
     private String myKey = "b4999fff82a03f767ca4f5fb9ab9521f";
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    private boolean added = false;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +104,7 @@ public class DetailActivity extends AppCompatActivity {
 
         NetworkUtilsTrailer.networkStatus(DetailActivity.this);
         new FetchTrailer().execute();
+        new FetchReview().execute();
         initViews();
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
@@ -113,6 +124,11 @@ public class DetailActivity extends AppCompatActivity {
         trailerAdapter =new TrailerAdapter(DetailActivity.this, mTrailerList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recyclerView.setAdapter(trailerAdapter);
+
+        recyclerView1 =findViewById(R.id.recycler_view2);
+        reviewAdapter = new ReviewAdapter((DetailActivity.this), mReviewList);
+        recyclerView1.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        recyclerView1.setAdapter(reviewAdapter);
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -178,14 +194,42 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mProgressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
         protected void onPostExecute(Void  s) {
             super.onPostExecute(s);
             trailerAdapter.setTrailerList(mTrailerList);
-            mProgressBar.setVisibility(View.INVISIBLE);
+        }
+
+    }//end AsyncTask
+
+
+    public class FetchReview extends AsyncTask<Void,Void,Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            int movieId = getIntent().getExtras().getInt("id");
+            reviewUrl = "http://api.themoviedb.org/3/movie/"+movieId+"/reviews?api_key=" +myKey;
+
+            mReviewList = new ArrayList<>();
+            try {
+                mReviewList = NetworkUtilsReview.fetchData(reviewUrl); //Get Reviews movies
+            }//end try
+            catch (IOException e){
+                e.printStackTrace();
+            }//end catch
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Void  s) {
+            super.onPostExecute(s);
+            reviewAdapter.setReviewList(mReviewList);
         }
 
     }//end AsyncTask

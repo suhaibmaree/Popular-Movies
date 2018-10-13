@@ -3,6 +3,8 @@ package com.example.suhaib.popularmovies;
 
 import android.arch.lifecycle.Observer;
 import android.os.AsyncTask;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -32,11 +34,16 @@ public class MainActivity extends AppCompatActivity {
     int mNoOfColumns;
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //Please note that you should set your [API KEY] in myKey from https://www.themoviedb.org/
-    private String myKey = "Your key";
+    private String myKey = "b4999fff82a03f767ca4f5fb9ab9521f";
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     ArrayList<Movie> mPopularList;
     ArrayList<Movie> mTopTopRatedList;
     private int flag;
+
+    private static String LIST_STATE = "list_state";
+    private Parcelable savedRecyclerState;
+    private static final String BUNDEL_RECYCLER_LAYOUT = "recycler_layout";
+    private ArrayList<Movie> moviesInstence = new ArrayList<>();
 
 
     @Override
@@ -48,26 +55,35 @@ public class MainActivity extends AppCompatActivity {
         mNoOfColumns = Utility.calculateNoOfColumns(getApplicationContext());
         NetworkUtils.networkStatus(MainActivity.this);
 
-        if (savedInstanceState != null){
+        Parcelable state = null;
+        if (savedInstanceState != null) {
+            state = savedInstanceState.getParcelable(BUNDEL_RECYCLER_LAYOUT);
+        }
+
+        if (savedInstanceState != null) {
             flag = savedInstanceState.getInt(ARG_FLAG);
-        }else
+        } else
             flag = 0;
 
         if (flag == 2)
             showFromDatabase();
         else
-            new FetchMovies(flag).execute();
+            new FetchMovies(flag ,state).execute();
 
-        initViews();
+        initViews(state);
+
         updateTitle();
     }//end onCreate
 
-    private void initViews() {
+    private void initViews(Parcelable savedRecyclerState) {
 
+        RecyclerView.LayoutManager m = new GridLayoutManager(this, mNoOfColumns);
+        if (savedRecyclerState != null)
+            m.onRestoreInstanceState(savedRecyclerState);
 
         recyclerView = findViewById(R.id.recycler_view);
         movieAdapter = new Adapter(MainActivity.this, mPopularList);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, mNoOfColumns));
+        recyclerView.setLayoutManager(m);
         recyclerView.setAdapter(movieAdapter);
 
     }//end initViews
@@ -75,9 +91,13 @@ public class MainActivity extends AppCompatActivity {
     //AsyncTask
     public class FetchMovies extends AsyncTask<Void, Void, Void> {
         int flag;
-        FetchMovies(int flag){
+        Parcelable state;
+
+        FetchMovies(int flag , Parcelable state ) {
             this.flag = flag;
+            this.state = state;
         }
+
         @Override
         protected Void doInBackground(Void... voids) {
             popularMovies = "http://api.themoviedb.org/3/movie/popular?api_key="
@@ -107,10 +127,17 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Void s) {
             super.onPostExecute(s);
             mProgressBar.setVisibility(View.INVISIBLE);
-            if (flag == 0)
+
+            if (flag == 0) {
                 movieAdapter.setMovieList(mPopularList);
-            else if (flag == 1)
+                if(state != null)
+                initViews(state);
+            }
+            else if (flag == 1) {
                 movieAdapter.setMovieList(mTopTopRatedList);
+                if (state != null)
+                    initViews(state);
+            }
         }
 
     }//end AsyncTask
@@ -127,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.pop_movies) {
             refreshList(mPopularList);
-            flag =0;
+            flag = 0;
 
         } else if (id == R.id.top_movies) {
             refreshList(mTopTopRatedList);
@@ -141,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    void updateTitle(){
+    void updateTitle() {
         if (flag == 0)
             setTitle("Most Populer");
         else if (flag == 1)
@@ -149,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
         else if (flag == 2)
             setTitle("Favorites");
     }
+
     private void showFromDatabase() {
         AppDatabase.getInstance(this).getMoviesDao()
                 .getAllMovies()
@@ -156,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onChanged(@Nullable List<Movie> movies) {
                         if (flag == 2)
-                        refreshList(movies);
+                            refreshList(movies);
                     }
                 });
     }
@@ -168,7 +196,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(ARG_FLAG,flag);
+        outState.putInt(ARG_FLAG, flag);
+        if (flag == 0) {
+            outState.putParcelable(BUNDEL_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
+        } else if (flag == 1) {
+            outState.putParcelable(BUNDEL_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
+        }
     }
+
+
 }
 
